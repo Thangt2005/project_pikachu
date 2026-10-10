@@ -1,29 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Pikachu</title>
+    <title>Game Pikachu 16x9</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="game-container">
-    <div class="header">
-        <div>điểm: <span id="score">0</span></div>
-        <div class="controls">
-            <label for="levelSelect">Màn:</label>
-            <select id="levelSelect">
-                <option value="1">Màn 1(cơ bản)</option>
-                <option value="2">Màn 2</option>
-                <option value="3">Màn 3</option>
-            </select>
-        </div>
-        <button id="btnReset">chơi lại</button>
-    </div>
-    <div id="board" class="board"></div>
+
+<h1>Game Pikachu 16x9</h1>
+<div class="control-level">
+    <label for="level-select">Màn chơi :</label>
+    <select id="level-select" onchange="doiManChoi(this.value)">
+        <option value="1">Màn 1</option>
+        <option value="2">Màn 2</option>
+        <option value="3">Màn 3</option>
+        <option value="4">Màn 4</option>
+        <option value="5">Màn 5</option>
+    </select>
+    <button onclick="choiLai()">Chơi lại !</button>
 </div>
-<script src="index.js"></script>
+<div>Thẻ còn lại: <span id="remain">144</span></div>
+
+<table id="game" border="1"></table>
+
+<script src="game.js"></script>
 </body>
 </html>
