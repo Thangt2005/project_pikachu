@@ -16,6 +16,10 @@ var level = 1;
 var latR1 = -1, latC1 = -1;
 var latR2 = -1, latC2 = -1;
 var isLock = 0;
+var hintCount = 3;//3 trợ giup
+var shuffleCount = 3;
+var hintR1 = -1, hintC1 = -1;
+var hintR2 = -1, hintC2 = -1;
 
 initBoard(level);
 initUI();
@@ -32,8 +36,20 @@ function choiLai() {
     latR1 = -1; latC1 = -1;
     latR2 = -1; latC2 = -1;
     isLock = 0;
+    hintCount = 3;
+    shuffleCount = 3;
+    hintR1 = -1;
+    hintC1 = -1;
+    hintR2 = -1;
+    hintC2 = -1;
+    document.getElementById("hintCount").innerText = hintCount;
+    document.getElementById("shuffleCount").innerText = shuffleCount;
     remain = soCot * soDong;
     document.getElementById("remain").innerText = remain;
+    if (level === 4 || level === 5) {
+        game.innerHTML = "";
+        return;
+    }
     initBoard(level);
     initUI();
     render();
@@ -121,8 +137,6 @@ function clickCell(d, c) {
                 document.getElementById("remain").innerText = remain;
 
                 if (level === 2) shiftDown();
-                else if (level === 4) shiftLeft();
-                else if (level === 5) shiftRight();
 
                 if (remain === 0) alert("Ban da thang game!");
             } else {
@@ -153,26 +167,37 @@ function render() {
     for (var i = 1; i <= soDong; i++) {
         for (var j = 1; j <= soCot; j++) {
             var cell = document.getElementById("cell_" + i + "_" + j);
+            if (cell === null) continue;
             var val = banCo[i][j];
 
             if (val === 0) {
                 cell.innerHTML = "";
                 cell.className = "cell empty";
+                cell.style.backgroundColor = "";
             } else {
                 cell.className = "cell";
+                cell.style.backgroundColor = "";
+
                 if (level === 3) {
-                    if ((i === latR1 && j === latC1) || (i === latR2 && j === latC2)) {
+                    if ((i === latR1 && j === latC1) ||
+                        (i === latR2 && j === latC2)) {
                         cell.innerHTML = icons[val];
                         cell.classList.add("flipped");
                     } else {
-                        cell.innerHTML = "❓";
+                        cell.innerHTML = "?";
                         cell.classList.add("covered");
                     }
                 } else {
                     cell.innerHTML = icons[val];
+
                     if (i === r1 && j === c1) {
                         cell.classList.add("selected");
                     }
+                }
+
+                if ((i === hintR1 && j === hintC1) ||
+                    (i === hintR2 && j === hintC2)) {
+                    cell.style.backgroundColor = "lightgreen";
                 }
             }
         }
@@ -243,35 +268,94 @@ function shiftDown() {
         }
     }
 }
+function goiY() {
+    if (hintCount <= 0 || isLock === 1) return;
 
-function shiftLeft() {
     for (var i = 1; i <= soDong; i++) {
         for (var j = 1; j <= soCot; j++) {
-            if (banCo[i][j] === 0) {
-                for (var k = j + 1; k <= soCot; k++) {
-                    if (banCo[i][k] !== 0) {
-                        banCo[i][j] = banCo[i][k];
-                        banCo[i][k] = 0;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-}
+            if (banCo[i][j] !== 0) {
+                for (var d = 1; d <= soDong; d++) {
+                    for (var c = 1; c <= soCot; c++) {
+                        if (banCo[d][c] !== 0 && (i !== d || j !== c)) {
+                            if (banCo[i][j] === banCo[d][c] &&
+                                checkPath(i, j, d, c)) {
 
-function shiftRight() {
-    for (var i = 1; i <= soDong; i++) {
-        for (var j = soCot; j >= 1; j--) {
-            if (banCo[i][j] === 0) {
-                for (var k = j - 1; k >= 1; k--) {
-                    if (banCo[i][k] !== 0) {
-                        banCo[i][j] = banCo[i][k];
-                        banCo[i][k] = 0;
-                        break;
+                                hintR1 = i;
+                                hintC1 = j;
+                                hintR2 = d;
+                                hintC2 = c;
+
+                                hintCount--;
+                                document.getElementById("hintCount").innerText = hintCount;
+
+                                render();
+
+                                setTimeout(function() {
+                                    hintR1 = -1;
+                                    hintC1 = -1;
+                                    hintR2 = -1;
+                                    hintC2 = -1;
+                                    render();
+                                }, 1000);
+
+                                return;
+                            }
+                        }
                     }
                 }
             }
         }
     }
+
+    alert("Khong tim thay cap o hop le!");
+}
+function xaoTron() {
+    if (shuffleCount <= 0 || isLock === 1) return;
+
+    var temp = [];
+
+    for (var i = 1; i <= soDong; i++) {
+        for (var j = 1; j <= soCot; j++) {
+            if (banCo[i][j] !== 0) {
+                temp.push(banCo[i][j]);
+            }
+        }
+    }
+
+    if (temp.length === 0) return;
+
+    for (var i = 0; i < temp.length; i++) {
+        var vt = Math.floor(Math.random() * temp.length);
+
+        var t = temp[i];
+        temp[i] = temp[vt];
+        temp[vt] = t;
+    }
+
+    var k = 0;
+
+    for (var i = 1; i <= soDong; i++) {
+        for (var j = 1; j <= soCot; j++) {
+            if (banCo[i][j] !== 0) {
+                banCo[i][j] = temp[k];
+                k++;
+            }
+        }
+    }
+
+    shuffleCount--;
+
+    document.getElementById("shuffleCount").innerText = shuffleCount;
+
+    r1 = -1;
+    c1 = -1;
+    r2 = -1;
+    c2 = -1;
+
+    hintR1 = -1;
+    hintC1 = -1;
+    hintR2 = -1;
+    hintC2 = -1;
+
+    render();
 }
