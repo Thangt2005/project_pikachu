@@ -3,7 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>Game Pikachu 16x9</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin-top: 20px;
+        }
+
+        .control-level {
+            margin-bottom: 15px;
+        }
+
+        .control-level select, .control-level button {
+            padding: 6px 12px;
+            font-size: 15px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+
+        #game {
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+
+        .cell {
+            width: 42px;
+            height: 42px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .selected {
+            background-color: yellow;
+        }
+
+        .empty {
+            background-color: #eee;
+            border: 1px solid #eee;
+            cursor: default;
+        }
+        .cell.covered {
+            background-color: #ccc;
+            color: #333;
+            user-select: none;
+        }
+
+        .cell.flipped {
+            background-color: #e0f0ff;
+        }
+        .control-game {
+            margin: 15px;
+        }
+
+        .control-game button {
+            padding: 8px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .cell.obstacle {
+            background-color: #555555;
+            color: white;
+            cursor: not-allowed;
+            border: 1px solid #333333;
+        }
+
+        #timer {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px auto;
+            padding: 8px;
+        }
+
+        #timer.sapHetGio {
+            color: red;
+        }
+
+
+    </style>
+
 </head>
 <body>
 
@@ -20,6 +105,7 @@
     <button onclick="choiLai()">Chơi lại !</button>
 </div>
 <div>Thẻ còn lại: <span id="remain">144</span></div>
+<div id="timer">Thời gian: 4:00</div>
 <div class="control-game">
     <button onclick="goiY()">Gợi ý ô (<span id="hintCount">3</span>)</button>
     <button onclick="xaoTron()">Xáo trộn (<span id="shuffleCount">3</span>)</button>
