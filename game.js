@@ -1,4 +1,3 @@
-
 var soCot = 16;
 var soDong = 9;
 var game = document.getElementById("game");
@@ -20,6 +19,7 @@ var level = 1;
 var latR1 = -1, latC1 = -1;
 var latR2 = -1, latC2 = -1;
 var isLock = 0;
+var isPause = 0;
 var hintCount = 3;
 var shuffleCount = 3;
 var hintR1 = -1, hintC1 = -1;
@@ -28,6 +28,7 @@ var hintR2 = -1, hintC2 = -1;
 initBoard(level);
 initUI();
 render();
+batDauDongHo();
 
 function doiManChoi(man) {
     level = parseInt(man);
@@ -36,6 +37,8 @@ function doiManChoi(man) {
 
 function choiLai() {
     dungDongHo();
+    isPause = 0;
+    document.getElementById("pauseBtn").innerText = "Tạm dừng";
     r1 = -1; c1 = -1;
     r2 = -1; c2 = -1;
     latR1 = -1; latC1 = -1;
@@ -58,11 +61,6 @@ function choiLai() {
     }
 
     document.getElementById("remain").innerText = remain;
-
-    if (level === 5) {
-        game.innerHTML = "";
-        return;
-    }
 
     initBoard(level);
     initUI();
@@ -194,7 +192,7 @@ function clickCell(d, c) {
                 if (remain === 0) {
                     dungDongHo();
                     isLock = 1;
-                    alert("Ban da thang game!");
+                    alert("you win !!!!");
                 }
 
                 return;
@@ -208,7 +206,7 @@ function clickCell(d, c) {
                         r2 = -1; c2 = -1;
                         latR1 = -1; latC1 = -1;
                         latR2 = -1; latC2 = -1;
-                        isLock = 0;
+                        if (isPause === 0) isLock = 0;
                         render();
                     }, 600);
 
@@ -501,6 +499,11 @@ function batDauDongHo() {
 
     taoDongHo();
     capNhatDongHo();
+    chayDongHo();
+}
+
+function chayDongHo() {
+    clearInterval(timerInterval);
 
     timerInterval = setInterval(function() {
         thoiGian--;
@@ -510,9 +513,26 @@ function batDauDongHo() {
             clearInterval(timerInterval);
             timerInterval = null;
             isLock = 1;
-            alert("Het thoi gian! Ban da thua.");
+            alert("time out, you lose");
         }
     }, 1000);
+}
+
+function tamDung() {
+    if (isPause === 0) {
+        if (timerInterval === null) return;
+
+        clearInterval(timerInterval);
+        timerInterval = null;
+        isPause = 1;
+        isLock = 1;
+        document.getElementById("pauseBtn").innerText = "Tiếp tục";
+    } else {
+        isPause = 0;
+        isLock = 0;
+        document.getElementById("pauseBtn").innerText = "Tạm dừng";
+        chayDongHo();
+    }
 }
 
 function capNhatDongHo() {
