@@ -11,6 +11,7 @@ var tongCot = soCot + 2;
 var icons = ["", "⚡", "🐲", "🐢", "🦊", "🦉", "🐸", "🐼", "🦄", "🐵", "🐶", "🐱", "🐥"];
 
 var banCo = [];
+var theUp = [];
 var r1 = -1, c1 = -1;
 var r2 = -1, c2 = -1;
 var remain = soCot * soDong;
@@ -25,10 +26,14 @@ var shuffleCount = 3;
 var hintR1 = -1, hintC1 = -1;
 var hintR2 = -1, hintC2 = -1;
 
+// man 4: so khoi vat can, moi khoi gom 2 o
+var soKhoiVatCan = 15;
+
 initBoard(level);
 initUI();
 render();
 batDauDongHo();
+hienHuongDan();
 
 function doiManChoi(man) {
     level = parseInt(man);
@@ -57,7 +62,7 @@ function choiLai() {
     remain = soCot * soDong;
 
     if (level === 4) {
-        remain = remain - 10;
+        remain = remain - soKhoiVatCan * 2;
     }
 
     document.getElementById("remain").innerText = remain;
@@ -66,30 +71,54 @@ function choiLai() {
     initUI();
     render();
     batDauDongHo();
+    hienHuongDan();
 }
 
 function initBoard(man) {
     for (var i = 0; i < tongDong; i++) {
         banCo[i] = [];
+        theUp[i] = [];
         for (var j = 0; j < tongCot; j++) {
             banCo[i][j] = 0;
+            theUp[i][j] = 0;
+
+            // man 3: khoang 1 nua so the bi up
+            if (man === 3 && Math.random() < 0.5) {
+                theUp[i][j] = 1;
+            }
         }
     }
 
     if (man === 4) {
-        banCo[2][4] = -1;
-        banCo[2][5] = -1;
-        banCo[3][4] = -1;
-        banCo[3][5] = -1;
+        var daDat = 0;
 
-        banCo[4][8] = -1;
-        banCo[5][8] = -1;
+        while (daDat < soKhoiVatCan) {
+            var dongRandom = Math.floor(Math.random() * soDong) + 1;
+            var cotRandom = Math.floor(Math.random() * soCot) + 1;
+            var huong = Math.floor(Math.random() * 2);
 
-        banCo[5][12] = -1;
-        banCo[6][12] = -1;
+            if (huong === 0) {
+                // khoi nam ngang: o hien tai va o ben phai
+                if (cotRandom + 1 <= soCot &&
+                    banCo[dongRandom][cotRandom] === 0 &&
+                    banCo[dongRandom][cotRandom + 1] === 0) {
 
-        banCo[7][6] = -1;
-        banCo[7][7] = -1;
+                    banCo[dongRandom][cotRandom] = -1;
+                    banCo[dongRandom][cotRandom + 1] = -1;
+                    daDat++;
+                }
+            } else {
+                // khoi nam doc: o hien tai va o ben duoi
+                if (dongRandom + 1 <= soDong &&
+                    banCo[dongRandom][cotRandom] === 0 &&
+                    banCo[dongRandom + 1][cotRandom] === 0) {
+
+                    banCo[dongRandom][cotRandom] = -1;
+                    banCo[dongRandom + 1][cotRandom] = -1;
+                    daDat++;
+                }
+            }
+        }
     }
 
     var temp = [];
@@ -254,6 +283,8 @@ function render() {
                         (i === latR2 && j === latC2)) {
                         cell.innerHTML = icons[val];
                         cell.classList.add("flipped");
+                    } else if (theUp[i][j] === 0) {
+                        cell.innerHTML = icons[val];
                     } else {
                         cell.innerHTML = "?";
                         cell.classList.add("covered");
@@ -552,4 +583,20 @@ function capNhatDongHo() {
 function dungDongHo() {
     clearInterval(timerInterval);
     timerInterval = null;
+}
+
+function hienHuongDan() {
+    var s = "";
+
+    if (level === 1) {
+        s = "Nối 2 ô giống nhau bằng đường đi tối đa 2 lần rẽ. Thời gian: 4 phút.";
+    } else if (level === 2) {
+        s = "Sau khi ăn, các ô phía trên sẽ rơi xuống lấp đầy chỗ trống. Thời gian: 4 phút 30 giây.";
+    } else if (level === 3) {
+        s = "Một nửa số thẻ bị úp (dấu ?). Bấm để lật, giống nhau và nối được thì ăn, sai thì úp lại. Thời gian: 6 phút.";
+    } else if (level === 4) {
+        s = "Các khối đen là vật cản, đường nối không được đi qua. Vị trí vật cản thay đổi ngẫu nhiên mỗi lần chơi. Thời gian: 5 phút.";
+    }
+
+    document.getElementById("huongDan").innerText = s;
 }
