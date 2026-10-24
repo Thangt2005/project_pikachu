@@ -90,32 +90,25 @@ function initBoard(man) {
     }
 
     if (man === 4) {
-        var daDat = 0;
+        var count = 0;
+        for (var lanThu = 0; lanThu < 200; lanThu++) {
+            if (count >= soKhoiVatCan) break;
 
-        while (daDat < soKhoiVatCan) {
-            var dongRandom = Math.floor(Math.random() * soDong) + 1;
-            var cotRandom = Math.floor(Math.random() * soCot) + 1;
-            var huong = Math.floor(Math.random() * 2);
+            var d = Math.floor(Math.random() * soDong) + 1;
+            var c = Math.floor(Math.random() * soCot) + 1;
+            var huong = Math.floor(Math.random() * 2); // 0: ngang, 1: doc
 
-            if (huong === 0) {
-                // khoi nam ngang: o hien tai va o ben phai
-                if (cotRandom + 1 <= soCot &&
-                    banCo[dongRandom][cotRandom] === 0 &&
-                    banCo[dongRandom][cotRandom + 1] === 0) {
-
-                    banCo[dongRandom][cotRandom] = -1;
-                    banCo[dongRandom][cotRandom + 1] = -1;
-                    daDat++;
+            if (huong === 0 && c + 1 <= soCot) {
+                if (banCo[d][c] === 0 && banCo[d][c + 1] === 0) {
+                    banCo[d][c] = -1;
+                    banCo[d][c + 1] = -1;
+                    count++;
                 }
-            } else {
-                // khoi nam doc: o hien tai va o ben duoi
-                if (dongRandom + 1 <= soDong &&
-                    banCo[dongRandom][cotRandom] === 0 &&
-                    banCo[dongRandom + 1][cotRandom] === 0) {
-
-                    banCo[dongRandom][cotRandom] = -1;
-                    banCo[dongRandom + 1][cotRandom] = -1;
-                    daDat++;
+            } else if (huong === 1 && d + 1 <= soDong) {
+                if (banCo[d][c] === 0 && banCo[d + 1][c] === 0) {
+                    banCo[d][c] = -1;
+                    banCo[d + 1][c] = -1;
+                    count++;
                 }
             }
         }
@@ -351,14 +344,18 @@ function checkL(d1, c1, d2, c2) {
 }
 
 function checkPath(d1, c1, d2, c2) {
+    // 1. Duong thang
     if (checkLine(d1, c1, d2, c2)) return true;
 
+    // 2. Gap khuc chu L
     if (checkL(d1, c1, d2, c2)) return true;
 
+    // 3. Gap khuc 2 lan re
     for (var c = 0; c < tongCot; c++) {
-        if ((c === c1 || banCo[d1][c] === 0) &&
-            (c === c2 || banCo[d2][c] === 0)) {
+        var o1Trong = (c === c1) || (banCo[d1][c] === 0);
+        var o2Trong = (c === c2) || (banCo[d2][c] === 0);
 
+        if (o1Trong && o2Trong) {
             if (checkLine(d1, c1, d1, c) &&
                 checkLine(d1, c, d2, c) &&
                 checkLine(d2, c, d2, c2)) {
@@ -367,10 +364,12 @@ function checkPath(d1, c1, d2, c2) {
         }
     }
 
+    // 4. Gap khuc 2 lan re
     for (var d = 0; d < tongDong; d++) {
-        if ((d === d1 || banCo[d][c1] === 0) &&
-            (d === d2 || banCo[d][c2] === 0)) {
+        var o1TrongDoc = (d === d1) || (banCo[d][c1] === 0);
+        var o2TrongDoc = (d === d2) || (banCo[d][c2] === 0);
 
+        if (o1TrongDoc && o2TrongDoc) {
             if (checkLine(d1, c1, d, c1) &&
                 checkLine(d, c1, d, c2) &&
                 checkLine(d, c2, d2, c2)) {
